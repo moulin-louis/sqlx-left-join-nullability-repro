@@ -14,21 +14,24 @@ decodes into its own inferred type first.
 
 ## Reproducing
 
-Requires a throwaway Postgres instance (do not point this at anything you
-care about) and `sqlx-cli` matching the `sqlx` version in `Cargo.toml`.
+Requires Docker (to run a disposable Postgres instance — don't point this
+at anything you care about) and `sqlx-cli` matching the `sqlx` version in
+`Cargo.toml`.
 
 ```sh
-initdb -D /tmp/sqlx-repro-pgdata -U postgres --no-locale
-pg_ctl -D /tmp/sqlx-repro-pgdata -l /tmp/sqlx-repro-pgdata/log.txt \
-  -o "-p 5544 -k /tmp -h 127.0.0.1" start
-
-createdb -h 127.0.0.1 -p 5544 -U postgres sqlx_repro
-psql -h 127.0.0.1 -p 5544 -U postgres -d sqlx_repro -f setup.sql
+docker run -d --name sqlx-repro-pg -e POSTGRES_HOST_AUTH_METHOD=trust \
+  -p 5544:5432 postgres:17
 
 export DATABASE_URL=postgres://postgres@127.0.0.1:5544/sqlx_repro
 
-cargo sqlx prepare   # regenerates .sqlx/*.json — inspect the `nullable` array
-cargo run            # triggers the runtime panic
+sqlx database create
+sqlx migrate run     # applies migrations/ — same schema/inserts as the bug report
+
+cargo sqlx prepare    # regenerates .sqlx/*.json — inspect the `nullable` array
+cargo run             # triggers the runtime panic
+
+# teardown
+docker rm -f sqlx-repro-pg
 ```
 
 ## The plan shape (why this happens)
