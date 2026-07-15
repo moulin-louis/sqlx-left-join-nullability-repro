@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT p.id, u.display_name AS author_display_name\n           FROM posts_min p\n           LEFT JOIN users_min u ON u.id = p.author_id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "posts_min",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "author_display_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users_min",
+            "name": "display_name"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true,
+      false
+    ]
+  },
+  "hash": "6191f34352435e3f968f8c0f763d26cc042f016b1f140cd20c86148252f31c64"
+}
